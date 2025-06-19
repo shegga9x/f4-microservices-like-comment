@@ -1,5 +1,6 @@
 package com.f4.commentlike.service.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.Instant;
@@ -9,6 +10,9 @@ import java.util.UUID;
 /**
  * A DTO for the {@link com.f4.commentlike.domain.Like} entity.
  */
+@Schema(
+    description = "The Like entity, representing a user's like on a parent item.\nThe parent can be a Reel, a Comment, etc. (Polymorphic Association)"
+)
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class LikeDTO implements Serializable {
 
@@ -16,7 +20,10 @@ public class LikeDTO implements Serializable {
     private UUID id;
 
     @NotNull
-    private UUID reelId;
+    private UUID parentId;
+
+    @NotNull
+    private String parentType;
 
     @NotNull
     private UUID userId;
@@ -32,12 +39,20 @@ public class LikeDTO implements Serializable {
         this.id = id;
     }
 
-    public UUID getReelId() {
-        return reelId;
+    public UUID getParentId() {
+        return parentId;
     }
 
-    public void setReelId(UUID reelId) {
-        this.reelId = reelId;
+    public void setParentId(UUID parentId) {
+        this.parentId = parentId;
+    }
+
+    public String getParentType() {
+        return parentType;
+    }
+
+    public void setParentType(String parentType) {
+        this.parentType = parentType;
     }
 
     public UUID getUserId() {
@@ -82,7 +97,8 @@ public class LikeDTO implements Serializable {
     public String toString() {
         return "LikeDTO{" +
             "id='" + getId() + "'" +
-            ", reelId='" + getReelId() + "'" +
+            ", parentId='" + getParentId() + "'" +
+            ", parentType='" + getParentType() + "'" +
             ", userId='" + getUserId() + "'" +
             ", createdAt='" + getCreatedAt() + "'" +
             "}";

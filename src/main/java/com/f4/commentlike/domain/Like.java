@@ -11,7 +11,8 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 /**
- * A Like.
+ * The Like entity, representing a user's like on a parent item.
+ * The parent can be a Reel, a Comment, etc. (Polymorphic Association)
  */
 @Entity
 @Table(name = "jhi_like")
@@ -30,8 +31,12 @@ public class Like implements Serializable {
 
     @NotNull
     @JdbcTypeCode(SqlTypes.VARCHAR)
-    @Column(name = "reel_id", length = 36, nullable = false)
-    private UUID reelId;
+    @Column(name = "parent_id", length = 36, nullable = false)
+    private UUID parentId;
+
+    @NotNull
+    @Column(name = "parent_type", nullable = false)
+    private String parentType;
 
     @NotNull
     @JdbcTypeCode(SqlTypes.VARCHAR)
@@ -57,17 +62,30 @@ public class Like implements Serializable {
         this.id = id;
     }
 
-    public UUID getReelId() {
-        return this.reelId;
+    public UUID getParentId() {
+        return this.parentId;
     }
 
-    public Like reelId(UUID reelId) {
-        this.setReelId(reelId);
+    public Like parentId(UUID parentId) {
+        this.setParentId(parentId);
         return this;
     }
 
-    public void setReelId(UUID reelId) {
-        this.reelId = reelId;
+    public void setParentId(UUID parentId) {
+        this.parentId = parentId;
+    }
+
+    public String getParentType() {
+        return this.parentType;
+    }
+
+    public Like parentType(String parentType) {
+        this.setParentType(parentType);
+        return this;
+    }
+
+    public void setParentType(String parentType) {
+        this.parentType = parentType;
     }
 
     public UUID getUserId() {
@@ -120,7 +138,8 @@ public class Like implements Serializable {
     public String toString() {
         return "Like{" +
             "id=" + getId() +
-            ", reelId='" + getReelId() + "'" +
+            ", parentId='" + getParentId() + "'" +
+            ", parentType='" + getParentType() + "'" +
             ", userId='" + getUserId() + "'" +
             ", createdAt='" + getCreatedAt() + "'" +
             "}";

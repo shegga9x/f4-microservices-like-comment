@@ -11,7 +11,8 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 /**
- * A Comment.
+ * The Comment entity, representing a user's comment on a parent item.
+ * The parent can be a Reel, another Comment, etc. (Polymorphic Association)
  */
 @Entity
 @Table(name = "comment")
@@ -30,8 +31,12 @@ public class Comment implements Serializable {
 
     @NotNull
     @JdbcTypeCode(SqlTypes.VARCHAR)
-    @Column(name = "reel_id", length = 36, nullable = false)
-    private UUID reelId;
+    @Column(name = "parent_id", length = 36, nullable = false)
+    private UUID parentId;
+
+    @NotNull
+    @Column(name = "parent_type", nullable = false)
+    private String parentType;
 
     @NotNull
     @JdbcTypeCode(SqlTypes.VARCHAR)
@@ -61,17 +66,30 @@ public class Comment implements Serializable {
         this.id = id;
     }
 
-    public UUID getReelId() {
-        return this.reelId;
+    public UUID getParentId() {
+        return this.parentId;
     }
 
-    public Comment reelId(UUID reelId) {
-        this.setReelId(reelId);
+    public Comment parentId(UUID parentId) {
+        this.setParentId(parentId);
         return this;
     }
 
-    public void setReelId(UUID reelId) {
-        this.reelId = reelId;
+    public void setParentId(UUID parentId) {
+        this.parentId = parentId;
+    }
+
+    public String getParentType() {
+        return this.parentType;
+    }
+
+    public Comment parentType(String parentType) {
+        this.setParentType(parentType);
+        return this;
+    }
+
+    public void setParentType(String parentType) {
+        this.parentType = parentType;
     }
 
     public UUID getUserId() {
@@ -137,7 +155,8 @@ public class Comment implements Serializable {
     public String toString() {
         return "Comment{" +
             "id=" + getId() +
-            ", reelId='" + getReelId() + "'" +
+            ", parentId='" + getParentId() + "'" +
+            ", parentType='" + getParentType() + "'" +
             ", userId='" + getUserId() + "'" +
             ", content='" + getContent() + "'" +
             ", createdAt='" + getCreatedAt() + "'" +

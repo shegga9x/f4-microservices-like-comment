@@ -27,9 +27,10 @@ public class AvroConverter {
 
         LikeDTO avroLikeDTO = LikeDTO.newBuilder()
                 .setId(likeDTO.getId() != null ? likeDTO.getId().toString() : null)
-                .setReelId(likeDTO.getReelId() != null ? likeDTO.getReelId().toString() : null)
+                .setReelId(likeDTO.getParentId() != null ? likeDTO.getParentId().toString() : null)
                 .setUserId(likeDTO.getUserId() != null ? likeDTO.getUserId().toString() : null)
-                // .setCreatedAt(likeDTO.getCreatedAt() != null ? likeDTO.getCreatedAt().toEpochMilli() : null)
+                // .setCreatedAt(likeDTO.getCreatedAt() != null ?
+                // likeDTO.getCreatedAt().toEpochMilli() : null)
                 .build();
 
         LOG.debug("Created Avro LikeDTO: {}", avroLikeDTO);
@@ -60,13 +61,13 @@ public class AvroConverter {
                 serviceDto.setId(UUID.fromString(avroPayload.getId()));
             }
             if (avroPayload.getReelId() != null) {
-                serviceDto.setReelId(UUID.fromString(avroPayload.getReelId()));
+                serviceDto.setParentId(UUID.fromString(avroPayload.getReelId()));
             }
             if (avroPayload.getUserId() != null) {
                 serviceDto.setUserId(UUID.fromString(avroPayload.getUserId()));
             }
             // if (avroPayload.getCreatedAt() != null) {
-            //     serviceDto.setCreatedAt(Instant.ofEpochMilli(avroPayload.getCreatedAt()));
+            // serviceDto.setCreatedAt(Instant.ofEpochMilli(avroPayload.getCreatedAt()));
             // }
             LOG.debug("Successfully converted to service LikeDTO: {}", serviceDto);
             return serviceDto;
