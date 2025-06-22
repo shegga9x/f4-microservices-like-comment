@@ -26,7 +26,7 @@
     <changeSet id="202506190001-2" author="jhipster">
         <comment>Load reel IDs from CSV</comment>
         <sql>
-            LOAD DATA LOCAL INFILE '{csv_path}/reel_ids.csv'
+            LOAD DATA LOCAL INFILE '${csv_path}/reel_ids.csv'
             INTO TABLE temp_reel_ids
             FIELDS TERMINATED BY ','
             LINES TERMINATED BY '\n'
@@ -36,7 +36,7 @@
     <changeSet id="202506190001-2a" author="jhipster">
         <comment>Load feed IDs from CSV</comment>
         <sql>
-            LOAD DATA LOCAL INFILE '{csv_path}/feed_ids.csv'
+            LOAD DATA LOCAL INFILE '${csv_path}/feed_ids.csv'
             INTO TABLE temp_feed_ids
             FIELDS TERMINATED BY ','
             LINES TERMINATED BY '\n'
@@ -46,7 +46,7 @@
     <changeSet id="202506190001-2b" author="jhipster">
         <comment>Load user IDs from CSV</comment>
         <sql>
-            LOAD DATA LOCAL INFILE '{csv_path}/user_ids.csv'
+            LOAD DATA LOCAL INFILE '${csv_path}/user_ids.csv'
             INTO TABLE temp_user_ids
             FIELDS TERMINATED BY ','
             LINES TERMINATED BY '\n'
