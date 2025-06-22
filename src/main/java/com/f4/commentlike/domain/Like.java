@@ -11,8 +11,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 /**
- * The Like entity, representing a user's like on a parent item.
- * The parent can be a Reel, a Comment, etc. (Polymorphic Association)
+ * A Like.
  */
 @Entity
 @Table(name = "jhi_like")
@@ -30,13 +29,13 @@ public class Like implements Serializable {
     private UUID id;
 
     @NotNull
+    @Column(name = "parent_type", nullable = false)
+    private String parentType;
+
+    @NotNull
     @JdbcTypeCode(SqlTypes.VARCHAR)
     @Column(name = "parent_id", length = 36, nullable = false)
     private UUID parentId;
-
-    @NotNull
-    @Column(name = "parent_type", nullable = false)
-    private String parentType;
 
     @NotNull
     @JdbcTypeCode(SqlTypes.VARCHAR)
@@ -62,19 +61,6 @@ public class Like implements Serializable {
         this.id = id;
     }
 
-    public UUID getParentId() {
-        return this.parentId;
-    }
-
-    public Like parentId(UUID parentId) {
-        this.setParentId(parentId);
-        return this;
-    }
-
-    public void setParentId(UUID parentId) {
-        this.parentId = parentId;
-    }
-
     public String getParentType() {
         return this.parentType;
     }
@@ -86,6 +72,19 @@ public class Like implements Serializable {
 
     public void setParentType(String parentType) {
         this.parentType = parentType;
+    }
+
+    public UUID getParentId() {
+        return this.parentId;
+    }
+
+    public Like parentId(UUID parentId) {
+        this.setParentId(parentId);
+        return this;
+    }
+
+    public void setParentId(UUID parentId) {
+        this.parentId = parentId;
     }
 
     public UUID getUserId() {
@@ -138,8 +137,8 @@ public class Like implements Serializable {
     public String toString() {
         return "Like{" +
             "id=" + getId() +
-            ", parentId='" + getParentId() + "'" +
             ", parentType='" + getParentType() + "'" +
+            ", parentId='" + getParentId() + "'" +
             ", userId='" + getUserId() + "'" +
             ", createdAt='" + getCreatedAt() + "'" +
             "}";

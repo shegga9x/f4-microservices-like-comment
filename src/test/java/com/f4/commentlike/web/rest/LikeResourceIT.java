@@ -36,8 +36,11 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockUser
 class LikeResourceIT {
 
-    private static final UUID DEFAULT_REEL_ID = UUID.randomUUID();
-    private static final UUID UPDATED_REEL_ID = UUID.randomUUID();
+    private static final String DEFAULT_PARENT_TYPE = "AAAAAAAAAA";
+    private static final String UPDATED_PARENT_TYPE = "BBBBBBBBBB";
+
+    private static final UUID DEFAULT_PARENT_ID = UUID.randomUUID();
+    private static final UUID UPDATED_PARENT_ID = UUID.randomUUID();
 
     private static final UUID DEFAULT_USER_ID = UUID.randomUUID();
     private static final UUID UPDATED_USER_ID = UUID.randomUUID();
@@ -74,7 +77,7 @@ class LikeResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Like createEntity() {
-        return new Like().reelId(DEFAULT_REEL_ID).userId(DEFAULT_USER_ID).createdAt(DEFAULT_CREATED_AT);
+        return new Like().parentType(DEFAULT_PARENT_TYPE).parentId(DEFAULT_PARENT_ID).userId(DEFAULT_USER_ID).createdAt(DEFAULT_CREATED_AT);
     }
 
     /**
@@ -84,7 +87,7 @@ class LikeResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Like createUpdatedEntity() {
-        return new Like().reelId(UPDATED_REEL_ID).userId(UPDATED_USER_ID).createdAt(UPDATED_CREATED_AT);
+        return new Like().parentType(UPDATED_PARENT_TYPE).parentId(UPDATED_PARENT_ID).userId(UPDATED_USER_ID).createdAt(UPDATED_CREATED_AT);
     }
 
     @BeforeEach
@@ -144,10 +147,27 @@ class LikeResourceIT {
 
     @Test
     @Transactional
-    void checkReelIdIsRequired() throws Exception {
+    void checkParentTypeIsRequired() throws Exception {
         long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
-        like.setReelId(null);
+        like.setParentType(null);
+
+        // Create the Like, which fails.
+        LikeDTO likeDTO = likeMapper.toDto(like);
+
+        restLikeMockMvc
+            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(likeDTO)))
+            .andExpect(status().isBadRequest());
+
+        assertSameRepositoryCount(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
+    void checkParentIdIsRequired() throws Exception {
+        long databaseSizeBeforeTest = getRepositoryCount();
+        // set the field null
+        like.setParentId(null);
 
         // Create the Like, which fails.
         LikeDTO likeDTO = likeMapper.toDto(like);
@@ -205,7 +225,8 @@ class LikeResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(like.getId().toString())))
-            .andExpect(jsonPath("$.[*].reelId").value(hasItem(DEFAULT_REEL_ID.toString())))
+            .andExpect(jsonPath("$.[*].parentType").value(hasItem(DEFAULT_PARENT_TYPE)))
+            .andExpect(jsonPath("$.[*].parentId").value(hasItem(DEFAULT_PARENT_ID.toString())))
             .andExpect(jsonPath("$.[*].userId").value(hasItem(DEFAULT_USER_ID.toString())))
             .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())));
     }
@@ -222,7 +243,8 @@ class LikeResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(like.getId().toString()))
-            .andExpect(jsonPath("$.reelId").value(DEFAULT_REEL_ID.toString()))
+            .andExpect(jsonPath("$.parentType").value(DEFAULT_PARENT_TYPE))
+            .andExpect(jsonPath("$.parentId").value(DEFAULT_PARENT_ID.toString()))
             .andExpect(jsonPath("$.userId").value(DEFAULT_USER_ID.toString()))
             .andExpect(jsonPath("$.createdAt").value(DEFAULT_CREATED_AT.toString()));
     }
@@ -246,7 +268,7 @@ class LikeResourceIT {
         Like updatedLike = likeRepository.findById(like.getId()).orElseThrow();
         // Disconnect from session so that the updates on updatedLike are not directly saved in db
         em.detach(updatedLike);
-        updatedLike.reelId(UPDATED_REEL_ID).userId(UPDATED_USER_ID).createdAt(UPDATED_CREATED_AT);
+        updatedLike.parentType(UPDATED_PARENT_TYPE).parentId(UPDATED_PARENT_ID).userId(UPDATED_USER_ID).createdAt(UPDATED_CREATED_AT);
         LikeDTO likeDTO = likeMapper.toDto(updatedLike);
 
         restLikeMockMvc
@@ -339,7 +361,11 @@ class LikeResourceIT {
         Like partialUpdatedLike = new Like();
         partialUpdatedLike.setId(like.getId());
 
-        partialUpdatedLike.reelId(UPDATED_REEL_ID).userId(UPDATED_USER_ID).createdAt(UPDATED_CREATED_AT);
+        partialUpdatedLike
+            .parentType(UPDATED_PARENT_TYPE)
+            .parentId(UPDATED_PARENT_ID)
+            .userId(UPDATED_USER_ID)
+            .createdAt(UPDATED_CREATED_AT);
 
         restLikeMockMvc
             .perform(
@@ -368,7 +394,11 @@ class LikeResourceIT {
         Like partialUpdatedLike = new Like();
         partialUpdatedLike.setId(like.getId());
 
-        partialUpdatedLike.reelId(UPDATED_REEL_ID).userId(UPDATED_USER_ID).createdAt(UPDATED_CREATED_AT);
+        partialUpdatedLike
+            .parentType(UPDATED_PARENT_TYPE)
+            .parentId(UPDATED_PARENT_ID)
+            .userId(UPDATED_USER_ID)
+            .createdAt(UPDATED_CREATED_AT);
 
         restLikeMockMvc
             .perform(

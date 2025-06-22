@@ -36,8 +36,11 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockUser
 class CommentResourceIT {
 
-    private static final UUID DEFAULT_REEL_ID = UUID.randomUUID();
-    private static final UUID UPDATED_REEL_ID = UUID.randomUUID();
+    private static final String DEFAULT_PARENT_TYPE = "AAAAAAAAAA";
+    private static final String UPDATED_PARENT_TYPE = "BBBBBBBBBB";
+
+    private static final UUID DEFAULT_PARENT_ID = UUID.randomUUID();
+    private static final UUID UPDATED_PARENT_ID = UUID.randomUUID();
 
     private static final UUID DEFAULT_USER_ID = UUID.randomUUID();
     private static final UUID UPDATED_USER_ID = UUID.randomUUID();
@@ -77,7 +80,12 @@ class CommentResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Comment createEntity() {
-        return new Comment().reelId(DEFAULT_REEL_ID).userId(DEFAULT_USER_ID).content(DEFAULT_CONTENT).createdAt(DEFAULT_CREATED_AT);
+        return new Comment()
+            .parentType(DEFAULT_PARENT_TYPE)
+            .parentId(DEFAULT_PARENT_ID)
+            .userId(DEFAULT_USER_ID)
+            .content(DEFAULT_CONTENT)
+            .createdAt(DEFAULT_CREATED_AT);
     }
 
     /**
@@ -87,7 +95,12 @@ class CommentResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Comment createUpdatedEntity() {
-        return new Comment().reelId(UPDATED_REEL_ID).userId(UPDATED_USER_ID).content(UPDATED_CONTENT).createdAt(UPDATED_CREATED_AT);
+        return new Comment()
+            .parentType(UPDATED_PARENT_TYPE)
+            .parentId(UPDATED_PARENT_ID)
+            .userId(UPDATED_USER_ID)
+            .content(UPDATED_CONTENT)
+            .createdAt(UPDATED_CREATED_AT);
     }
 
     @BeforeEach
@@ -149,10 +162,27 @@ class CommentResourceIT {
 
     @Test
     @Transactional
-    void checkReelIdIsRequired() throws Exception {
+    void checkParentTypeIsRequired() throws Exception {
         long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
-        comment.setReelId(null);
+        comment.setParentType(null);
+
+        // Create the Comment, which fails.
+        CommentDTO commentDTO = commentMapper.toDto(comment);
+
+        restCommentMockMvc
+            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(commentDTO)))
+            .andExpect(status().isBadRequest());
+
+        assertSameRepositoryCount(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
+    void checkParentIdIsRequired() throws Exception {
+        long databaseSizeBeforeTest = getRepositoryCount();
+        // set the field null
+        comment.setParentId(null);
 
         // Create the Comment, which fails.
         CommentDTO commentDTO = commentMapper.toDto(comment);
@@ -210,7 +240,8 @@ class CommentResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(comment.getId().toString())))
-            .andExpect(jsonPath("$.[*].reelId").value(hasItem(DEFAULT_REEL_ID.toString())))
+            .andExpect(jsonPath("$.[*].parentType").value(hasItem(DEFAULT_PARENT_TYPE)))
+            .andExpect(jsonPath("$.[*].parentId").value(hasItem(DEFAULT_PARENT_ID.toString())))
             .andExpect(jsonPath("$.[*].userId").value(hasItem(DEFAULT_USER_ID.toString())))
             .andExpect(jsonPath("$.[*].content").value(hasItem(DEFAULT_CONTENT)))
             .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())));
@@ -228,7 +259,8 @@ class CommentResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(comment.getId().toString()))
-            .andExpect(jsonPath("$.reelId").value(DEFAULT_REEL_ID.toString()))
+            .andExpect(jsonPath("$.parentType").value(DEFAULT_PARENT_TYPE))
+            .andExpect(jsonPath("$.parentId").value(DEFAULT_PARENT_ID.toString()))
             .andExpect(jsonPath("$.userId").value(DEFAULT_USER_ID.toString()))
             .andExpect(jsonPath("$.content").value(DEFAULT_CONTENT))
             .andExpect(jsonPath("$.createdAt").value(DEFAULT_CREATED_AT.toString()));
@@ -253,7 +285,12 @@ class CommentResourceIT {
         Comment updatedComment = commentRepository.findById(comment.getId()).orElseThrow();
         // Disconnect from session so that the updates on updatedComment are not directly saved in db
         em.detach(updatedComment);
-        updatedComment.reelId(UPDATED_REEL_ID).userId(UPDATED_USER_ID).content(UPDATED_CONTENT).createdAt(UPDATED_CREATED_AT);
+        updatedComment
+            .parentType(UPDATED_PARENT_TYPE)
+            .parentId(UPDATED_PARENT_ID)
+            .userId(UPDATED_USER_ID)
+            .content(UPDATED_CONTENT)
+            .createdAt(UPDATED_CREATED_AT);
         CommentDTO commentDTO = commentMapper.toDto(updatedComment);
 
         restCommentMockMvc
@@ -346,7 +383,7 @@ class CommentResourceIT {
         Comment partialUpdatedComment = new Comment();
         partialUpdatedComment.setId(comment.getId());
 
-        partialUpdatedComment.reelId(UPDATED_REEL_ID);
+        partialUpdatedComment.parentType(UPDATED_PARENT_TYPE).createdAt(UPDATED_CREATED_AT);
 
         restCommentMockMvc
             .perform(
@@ -375,7 +412,12 @@ class CommentResourceIT {
         Comment partialUpdatedComment = new Comment();
         partialUpdatedComment.setId(comment.getId());
 
-        partialUpdatedComment.reelId(UPDATED_REEL_ID).userId(UPDATED_USER_ID).content(UPDATED_CONTENT).createdAt(UPDATED_CREATED_AT);
+        partialUpdatedComment
+            .parentType(UPDATED_PARENT_TYPE)
+            .parentId(UPDATED_PARENT_ID)
+            .userId(UPDATED_USER_ID)
+            .content(UPDATED_CONTENT)
+            .createdAt(UPDATED_CREATED_AT);
 
         restCommentMockMvc
             .perform(

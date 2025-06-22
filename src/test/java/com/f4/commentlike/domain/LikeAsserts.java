@@ -47,7 +47,8 @@ public class LikeAsserts {
     public static void assertLikeUpdatableFieldsEquals(Like expected, Like actual) {
         assertThat(actual)
             .as("Verify Like relevant properties")
-            .satisfies(a -> assertThat(a.getReelId()).as("check reelId").isEqualTo(expected.getReelId()))
+            .satisfies(a -> assertThat(a.getParentType()).as("check parentType").isEqualTo(expected.getParentType()))
+            .satisfies(a -> assertThat(a.getParentId()).as("check parentId").isEqualTo(expected.getParentId()))
             .satisfies(a -> assertThat(a.getUserId()).as("check userId").isEqualTo(expected.getUserId()))
             .satisfies(a -> assertThat(a.getCreatedAt()).as("check createdAt").isEqualTo(expected.getCreatedAt()));
     }

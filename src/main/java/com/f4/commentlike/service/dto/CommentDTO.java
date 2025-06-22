@@ -1,6 +1,5 @@
 package com.f4.commentlike.service.dto;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Lob;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
@@ -11,9 +10,6 @@ import java.util.UUID;
 /**
  * A DTO for the {@link com.f4.commentlike.domain.Comment} entity.
  */
-@Schema(
-    description = "The Comment entity, representing a user's comment on a parent item.\nThe parent can be a Reel, another Comment, etc. (Polymorphic Association)"
-)
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class CommentDTO implements Serializable {
 
@@ -21,10 +17,10 @@ public class CommentDTO implements Serializable {
     private UUID id;
 
     @NotNull
-    private UUID parentId;
+    private String parentType;
 
     @NotNull
-    private String parentType;
+    private UUID parentId;
 
     @NotNull
     private UUID userId;
@@ -43,20 +39,20 @@ public class CommentDTO implements Serializable {
         this.id = id;
     }
 
-    public UUID getParentId() {
-        return parentId;
-    }
-
-    public void setParentId(UUID parentId) {
-        this.parentId = parentId;
-    }
-
     public String getParentType() {
         return parentType;
     }
 
     public void setParentType(String parentType) {
         this.parentType = parentType;
+    }
+
+    public UUID getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(UUID parentId) {
+        this.parentId = parentId;
     }
 
     public UUID getUserId() {
@@ -109,8 +105,8 @@ public class CommentDTO implements Serializable {
     public String toString() {
         return "CommentDTO{" +
             "id='" + getId() + "'" +
-            ", parentId='" + getParentId() + "'" +
             ", parentType='" + getParentType() + "'" +
+            ", parentId='" + getParentId() + "'" +
             ", userId='" + getUserId() + "'" +
             ", content='" + getContent() + "'" +
             ", createdAt='" + getCreatedAt() + "'" +

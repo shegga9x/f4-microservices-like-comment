@@ -47,7 +47,8 @@ public class CommentAsserts {
     public static void assertCommentUpdatableFieldsEquals(Comment expected, Comment actual) {
         assertThat(actual)
             .as("Verify Comment relevant properties")
-            .satisfies(a -> assertThat(a.getReelId()).as("check reelId").isEqualTo(expected.getReelId()))
+            .satisfies(a -> assertThat(a.getParentType()).as("check parentType").isEqualTo(expected.getParentType()))
+            .satisfies(a -> assertThat(a.getParentId()).as("check parentId").isEqualTo(expected.getParentId()))
             .satisfies(a -> assertThat(a.getUserId()).as("check userId").isEqualTo(expected.getUserId()))
             .satisfies(a -> assertThat(a.getContent()).as("check content").isEqualTo(expected.getContent()))
             .satisfies(a -> assertThat(a.getCreatedAt()).as("check createdAt").isEqualTo(expected.getCreatedAt()));
