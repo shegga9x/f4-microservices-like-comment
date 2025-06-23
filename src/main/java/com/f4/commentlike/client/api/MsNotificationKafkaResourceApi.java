@@ -1,7 +1,6 @@
 package com.f4.commentlike.client.api;
 
 import com.f4.commentlike.client.ApiClient;
-import com.f4.commentlike.client.EncodingUtils;
 import com.f4.commentlike.client.model.ApiResponse;
 
 import com.f4.commentlike.client.model.ReelRequest;
