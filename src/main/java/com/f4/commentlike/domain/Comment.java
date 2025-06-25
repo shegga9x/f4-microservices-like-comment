@@ -50,6 +50,22 @@ public class Comment implements Serializable {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
+    @NotNull
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
+
+    @NotNull
+    @Column(name = "likes_count", nullable = false)
+    private Integer likesCount;
+
+    @NotNull
+    @Column(name = "replies_count", nullable = false)
+    private Integer repliesCount;
+
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(name = "mentions", length = 36)
+    private UUID mentions;
+
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public UUID getId() {
@@ -130,6 +146,58 @@ public class Comment implements Serializable {
         this.createdAt = createdAt;
     }
 
+    public Instant getUpdatedAt() {
+        return this.updatedAt;
+    }
+
+    public Comment updatedAt(Instant updatedAt) {
+        this.setUpdatedAt(updatedAt);
+        return this;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public Integer getLikesCount() {
+        return this.likesCount;
+    }
+
+    public Comment likesCount(Integer likesCount) {
+        this.setLikesCount(likesCount);
+        return this;
+    }
+
+    public void setLikesCount(Integer likesCount) {
+        this.likesCount = likesCount;
+    }
+
+    public Integer getRepliesCount() {
+        return this.repliesCount;
+    }
+
+    public Comment repliesCount(Integer repliesCount) {
+        this.setRepliesCount(repliesCount);
+        return this;
+    }
+
+    public void setRepliesCount(Integer repliesCount) {
+        this.repliesCount = repliesCount;
+    }
+
+    public UUID getMentions() {
+        return this.mentions;
+    }
+
+    public Comment mentions(UUID mentions) {
+        this.setMentions(mentions);
+        return this;
+    }
+
+    public void setMentions(UUID mentions) {
+        this.mentions = mentions;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -159,6 +227,10 @@ public class Comment implements Serializable {
             ", userId='" + getUserId() + "'" +
             ", content='" + getContent() + "'" +
             ", createdAt='" + getCreatedAt() + "'" +
+            ", updatedAt='" + getUpdatedAt() + "'" +
+            ", likesCount=" + getLikesCount() +
+            ", repliesCount=" + getRepliesCount() +
+            ", mentions='" + getMentions() + "'" +
             "}";
     }
 }

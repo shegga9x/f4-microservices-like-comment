@@ -31,6 +31,17 @@ public class CommentDTO implements Serializable {
     @NotNull
     private Instant createdAt;
 
+    @NotNull
+    private Instant updatedAt;
+
+    @NotNull
+    private Integer likesCount;
+
+    @NotNull
+    private Integer repliesCount;
+
+    private UUID mentions;
+
     public UUID getId() {
         return id;
     }
@@ -79,6 +90,38 @@ public class CommentDTO implements Serializable {
         this.createdAt = createdAt;
     }
 
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public Integer getLikesCount() {
+        return likesCount;
+    }
+
+    public void setLikesCount(Integer likesCount) {
+        this.likesCount = likesCount;
+    }
+
+    public Integer getRepliesCount() {
+        return repliesCount;
+    }
+
+    public void setRepliesCount(Integer repliesCount) {
+        this.repliesCount = repliesCount;
+    }
+
+    public UUID getMentions() {
+        return mentions;
+    }
+
+    public void setMentions(UUID mentions) {
+        this.mentions = mentions;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -110,6 +153,10 @@ public class CommentDTO implements Serializable {
             ", userId='" + getUserId() + "'" +
             ", content='" + getContent() + "'" +
             ", createdAt='" + getCreatedAt() + "'" +
+            ", updatedAt='" + getUpdatedAt() + "'" +
+            ", likesCount=" + getLikesCount() +
+            ", repliesCount=" + getRepliesCount() +
+            ", mentions='" + getMentions() + "'" +
             "}";
     }
 }

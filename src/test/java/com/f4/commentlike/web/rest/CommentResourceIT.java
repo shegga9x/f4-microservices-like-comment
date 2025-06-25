@@ -51,6 +51,18 @@ class CommentResourceIT {
     private static final Instant DEFAULT_CREATED_AT = Instant.ofEpochMilli(0L);
     private static final Instant UPDATED_CREATED_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
+    private static final Instant DEFAULT_UPDATED_AT = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_UPDATED_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+
+    private static final Integer DEFAULT_LIKES_COUNT = 1;
+    private static final Integer UPDATED_LIKES_COUNT = 2;
+
+    private static final Integer DEFAULT_REPLIES_COUNT = 1;
+    private static final Integer UPDATED_REPLIES_COUNT = 2;
+
+    private static final UUID DEFAULT_MENTIONS = UUID.randomUUID();
+    private static final UUID UPDATED_MENTIONS = UUID.randomUUID();
+
     private static final String ENTITY_API_URL = "/api/comments";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
@@ -85,7 +97,11 @@ class CommentResourceIT {
             .parentId(DEFAULT_PARENT_ID)
             .userId(DEFAULT_USER_ID)
             .content(DEFAULT_CONTENT)
-            .createdAt(DEFAULT_CREATED_AT);
+            .createdAt(DEFAULT_CREATED_AT)
+            .updatedAt(DEFAULT_UPDATED_AT)
+            .likesCount(DEFAULT_LIKES_COUNT)
+            .repliesCount(DEFAULT_REPLIES_COUNT)
+            .mentions(DEFAULT_MENTIONS);
     }
 
     /**
@@ -100,7 +116,11 @@ class CommentResourceIT {
             .parentId(UPDATED_PARENT_ID)
             .userId(UPDATED_USER_ID)
             .content(UPDATED_CONTENT)
-            .createdAt(UPDATED_CREATED_AT);
+            .createdAt(UPDATED_CREATED_AT)
+            .updatedAt(UPDATED_UPDATED_AT)
+            .likesCount(UPDATED_LIKES_COUNT)
+            .repliesCount(UPDATED_REPLIES_COUNT)
+            .mentions(UPDATED_MENTIONS);
     }
 
     @BeforeEach
@@ -230,6 +250,57 @@ class CommentResourceIT {
 
     @Test
     @Transactional
+    void checkUpdatedAtIsRequired() throws Exception {
+        long databaseSizeBeforeTest = getRepositoryCount();
+        // set the field null
+        comment.setUpdatedAt(null);
+
+        // Create the Comment, which fails.
+        CommentDTO commentDTO = commentMapper.toDto(comment);
+
+        restCommentMockMvc
+            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(commentDTO)))
+            .andExpect(status().isBadRequest());
+
+        assertSameRepositoryCount(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
+    void checkLikesCountIsRequired() throws Exception {
+        long databaseSizeBeforeTest = getRepositoryCount();
+        // set the field null
+        comment.setLikesCount(null);
+
+        // Create the Comment, which fails.
+        CommentDTO commentDTO = commentMapper.toDto(comment);
+
+        restCommentMockMvc
+            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(commentDTO)))
+            .andExpect(status().isBadRequest());
+
+        assertSameRepositoryCount(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
+    void checkRepliesCountIsRequired() throws Exception {
+        long databaseSizeBeforeTest = getRepositoryCount();
+        // set the field null
+        comment.setRepliesCount(null);
+
+        // Create the Comment, which fails.
+        CommentDTO commentDTO = commentMapper.toDto(comment);
+
+        restCommentMockMvc
+            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(commentDTO)))
+            .andExpect(status().isBadRequest());
+
+        assertSameRepositoryCount(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
     void getAllComments() throws Exception {
         // Initialize the database
         insertedComment = commentRepository.saveAndFlush(comment);
@@ -244,7 +315,11 @@ class CommentResourceIT {
             .andExpect(jsonPath("$.[*].parentId").value(hasItem(DEFAULT_PARENT_ID.toString())))
             .andExpect(jsonPath("$.[*].userId").value(hasItem(DEFAULT_USER_ID.toString())))
             .andExpect(jsonPath("$.[*].content").value(hasItem(DEFAULT_CONTENT)))
-            .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())));
+            .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].updatedAt").value(hasItem(DEFAULT_UPDATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].likesCount").value(hasItem(DEFAULT_LIKES_COUNT)))
+            .andExpect(jsonPath("$.[*].repliesCount").value(hasItem(DEFAULT_REPLIES_COUNT)))
+            .andExpect(jsonPath("$.[*].mentions").value(hasItem(DEFAULT_MENTIONS.toString())));
     }
 
     @Test
@@ -263,7 +338,11 @@ class CommentResourceIT {
             .andExpect(jsonPath("$.parentId").value(DEFAULT_PARENT_ID.toString()))
             .andExpect(jsonPath("$.userId").value(DEFAULT_USER_ID.toString()))
             .andExpect(jsonPath("$.content").value(DEFAULT_CONTENT))
-            .andExpect(jsonPath("$.createdAt").value(DEFAULT_CREATED_AT.toString()));
+            .andExpect(jsonPath("$.createdAt").value(DEFAULT_CREATED_AT.toString()))
+            .andExpect(jsonPath("$.updatedAt").value(DEFAULT_UPDATED_AT.toString()))
+            .andExpect(jsonPath("$.likesCount").value(DEFAULT_LIKES_COUNT))
+            .andExpect(jsonPath("$.repliesCount").value(DEFAULT_REPLIES_COUNT))
+            .andExpect(jsonPath("$.mentions").value(DEFAULT_MENTIONS.toString()));
     }
 
     @Test
@@ -290,7 +369,11 @@ class CommentResourceIT {
             .parentId(UPDATED_PARENT_ID)
             .userId(UPDATED_USER_ID)
             .content(UPDATED_CONTENT)
-            .createdAt(UPDATED_CREATED_AT);
+            .createdAt(UPDATED_CREATED_AT)
+            .updatedAt(UPDATED_UPDATED_AT)
+            .likesCount(UPDATED_LIKES_COUNT)
+            .repliesCount(UPDATED_REPLIES_COUNT)
+            .mentions(UPDATED_MENTIONS);
         CommentDTO commentDTO = commentMapper.toDto(updatedComment);
 
         restCommentMockMvc
@@ -383,7 +466,11 @@ class CommentResourceIT {
         Comment partialUpdatedComment = new Comment();
         partialUpdatedComment.setId(comment.getId());
 
-        partialUpdatedComment.parentType(UPDATED_PARENT_TYPE).createdAt(UPDATED_CREATED_AT);
+        partialUpdatedComment
+            .parentType(UPDATED_PARENT_TYPE)
+            .createdAt(UPDATED_CREATED_AT)
+            .updatedAt(UPDATED_UPDATED_AT)
+            .repliesCount(UPDATED_REPLIES_COUNT);
 
         restCommentMockMvc
             .perform(
@@ -417,7 +504,11 @@ class CommentResourceIT {
             .parentId(UPDATED_PARENT_ID)
             .userId(UPDATED_USER_ID)
             .content(UPDATED_CONTENT)
-            .createdAt(UPDATED_CREATED_AT);
+            .createdAt(UPDATED_CREATED_AT)
+            .updatedAt(UPDATED_UPDATED_AT)
+            .likesCount(UPDATED_LIKES_COUNT)
+            .repliesCount(UPDATED_REPLIES_COUNT)
+            .mentions(UPDATED_MENTIONS);
 
         restCommentMockMvc
             .perform(
