@@ -2,7 +2,7 @@
   "annotations": {
     "changelogDate": "20250422052415"
   },
-  "applications": ["ms_commentlike"],
+  "applications": ["gateway", "ms_commentlike"],
   "clientRootFolder": "ms_commentlike",
   "databaseType": "sql",
   "dto": "mapstruct",
@@ -13,7 +13,12 @@
       "fieldValidateRules": ["required"]
     },
     {
-      "fieldName": "reelId",
+      "fieldName": "parentType",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "parentId",
       "fieldType": "UUID",
       "fieldValidateRules": ["required"]
     },

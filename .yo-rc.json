@@ -8,6 +8,7 @@
     "devDatabaseType": "mysql",
     "enableSwaggerCodegen": true,
     "entities": ["Comment", "Like"],
+    "gatewayServerPort": "8080",
     "jhipsterVersion": "8.10.0",
     "jwtSecretKey": "YmExMWNkODQyMzI5M2Y3YThjZGVlYzE3MjQzODM0NzBlZjk4N2QzM2QxMmY1YWM2YmIxMDI1NGQwNTRlMDE1YWMwMjQ1YTU0OTdjYmJmMzUwOWE2ZGQ0NzUyNjg4YTU0NjAyODlhNjRiZTg1OGE5Yzk1NTgwZWVmZWNiMGZlMTM=",
     "languages": ["en"],
