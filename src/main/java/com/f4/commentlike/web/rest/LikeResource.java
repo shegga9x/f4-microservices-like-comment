@@ -177,4 +177,43 @@ public class LikeResource {
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }
+
+    /**
+     * {@code GET  /likes/by-parent} : get likes by parentId and parentType.
+     *
+     * @param parentId   the parent ID to get likes for.
+     * @param parentType the parent type to get likes for.
+     * @param pageable   the pagination information.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
+     *         of likes in body.
+     */
+    @GetMapping("/by-parent")
+    public ResponseEntity<List<LikeDTO>> getLikesByParent(
+            @RequestParam("parentId") UUID parentId,
+            @RequestParam("parentType") String parentType,
+            @org.springdoc.core.annotations.ParameterObject Pageable pageable) {
+        LOG.debug("REST request to get likes for parentId: {} and parentType: {}", parentId, parentType);
+        Page<LikeDTO> page = likeService.findByParentIdAndParentType(parentId, parentType, pageable);
+        HttpHeaders headers = PaginationUtil
+                .generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    /**
+     * {@code GET  /likes/countByParentIdAndParentType} : get count of likes by parentId and
+     * parentType.
+     *
+     * @param parentId   the parent ID to count likes for.
+     * @param parentType the parent type to count likes for.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count
+     *         in body.
+     */
+    @GetMapping("/countByParentIdAndParentType")
+    public ResponseEntity<Long> countByParentIdAndParentType(
+            @RequestParam("parentId") UUID parentId,
+            @RequestParam("parentType") String parentType) {
+        LOG.debug("REST request to get like count for parentId: {} and parentType: {}", parentId, parentType);
+        long count = likeService.countByParentIdAndParentType(parentId, parentType);
+        return ResponseEntity.ok(count);
+    }
 }

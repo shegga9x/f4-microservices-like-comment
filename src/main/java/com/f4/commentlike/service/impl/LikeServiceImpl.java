@@ -82,4 +82,18 @@ public class LikeServiceImpl implements LikeService {
         LOG.debug("Request to delete Like : {}", id);
         likeRepository.deleteById(id);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<LikeDTO> findByParentIdAndParentType(UUID parentId, String parentType, Pageable pageable) {
+        LOG.debug("Request to get Likes by parentId: {} and parentType: {}", parentId, parentType);
+        return likeRepository.findByParentIdAndParentType(parentId, parentType, pageable)
+            .map(likeMapper::toDto);
+    }
+
+    @Override
+    public long countByParentIdAndParentType(UUID parentId, String parentType) {
+        LOG.debug("Request to count Likes by parentId: {} and parentType: {}", parentId, parentType);
+        return likeRepository.countByParentIdAndParentType(parentId, parentType);
+    }
 }

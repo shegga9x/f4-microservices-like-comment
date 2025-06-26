@@ -82,4 +82,18 @@ public class CommentServiceImpl implements CommentService {
         LOG.debug("Request to delete Comment : {}", id);
         commentRepository.deleteById(id);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<CommentDTO> findByParentIdAndParentType(UUID parentId, String parentType, Pageable pageable) {
+        LOG.debug("Request to get Comments by parentId: {} and parentType: {}", parentId, parentType);
+        return commentRepository.findByParentIdAndParentType(parentId, parentType, pageable)
+            .map(commentMapper::toDto);
+    }
+
+    @Override
+    public long countByParentIdAndParentType(UUID parentId, String parentType) {
+        LOG.debug("Request to count Comments by parentId: {} and parentType: {}", parentId, parentType);
+        return commentRepository.countByParentIdAndParentType(parentId, parentType);
+    }
 }

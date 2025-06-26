@@ -56,4 +56,23 @@ public interface LikeService {
      * @param id the id of the entity.
      */
     void delete(UUID id);
+
+    /**
+     * Get likes by parentId and parentType.
+     *
+     * @param parentId the parent ID.
+     * @param parentType the parent type.
+     * @param pageable the pagination information.
+     * @return the list of entities.
+     */
+    Page<LikeDTO> findByParentIdAndParentType(UUID parentId, String parentType, Pageable pageable);
+
+    /**
+     * Count likes by parentId and parentType.
+     *
+     * @param parentId the parent ID.
+     * @param parentType the parent type.
+     * @return the count of entities.
+     */
+    long countByParentIdAndParentType(UUID parentId, String parentType);
 }
