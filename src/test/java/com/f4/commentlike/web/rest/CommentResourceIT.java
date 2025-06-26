@@ -54,12 +54,6 @@ class CommentResourceIT {
     private static final Instant DEFAULT_UPDATED_AT = Instant.ofEpochMilli(0L);
     private static final Instant UPDATED_UPDATED_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
-    private static final Integer DEFAULT_LIKES_COUNT = 1;
-    private static final Integer UPDATED_LIKES_COUNT = 2;
-
-    private static final Integer DEFAULT_REPLIES_COUNT = 1;
-    private static final Integer UPDATED_REPLIES_COUNT = 2;
-
     private static final UUID DEFAULT_MENTIONS = UUID.randomUUID();
     private static final UUID UPDATED_MENTIONS = UUID.randomUUID();
 
@@ -99,8 +93,6 @@ class CommentResourceIT {
             .content(DEFAULT_CONTENT)
             .createdAt(DEFAULT_CREATED_AT)
             .updatedAt(DEFAULT_UPDATED_AT)
-            .likesCount(DEFAULT_LIKES_COUNT)
-            .repliesCount(DEFAULT_REPLIES_COUNT)
             .mentions(DEFAULT_MENTIONS);
     }
 
@@ -118,8 +110,6 @@ class CommentResourceIT {
             .content(UPDATED_CONTENT)
             .createdAt(UPDATED_CREATED_AT)
             .updatedAt(UPDATED_UPDATED_AT)
-            .likesCount(UPDATED_LIKES_COUNT)
-            .repliesCount(UPDATED_REPLIES_COUNT)
             .mentions(UPDATED_MENTIONS);
     }
 
@@ -267,40 +257,6 @@ class CommentResourceIT {
 
     @Test
     @Transactional
-    void checkLikesCountIsRequired() throws Exception {
-        long databaseSizeBeforeTest = getRepositoryCount();
-        // set the field null
-        comment.setLikesCount(null);
-
-        // Create the Comment, which fails.
-        CommentDTO commentDTO = commentMapper.toDto(comment);
-
-        restCommentMockMvc
-            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(commentDTO)))
-            .andExpect(status().isBadRequest());
-
-        assertSameRepositoryCount(databaseSizeBeforeTest);
-    }
-
-    @Test
-    @Transactional
-    void checkRepliesCountIsRequired() throws Exception {
-        long databaseSizeBeforeTest = getRepositoryCount();
-        // set the field null
-        comment.setRepliesCount(null);
-
-        // Create the Comment, which fails.
-        CommentDTO commentDTO = commentMapper.toDto(comment);
-
-        restCommentMockMvc
-            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(commentDTO)))
-            .andExpect(status().isBadRequest());
-
-        assertSameRepositoryCount(databaseSizeBeforeTest);
-    }
-
-    @Test
-    @Transactional
     void getAllComments() throws Exception {
         // Initialize the database
         insertedComment = commentRepository.saveAndFlush(comment);
@@ -317,8 +273,6 @@ class CommentResourceIT {
             .andExpect(jsonPath("$.[*].content").value(hasItem(DEFAULT_CONTENT)))
             .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())))
             .andExpect(jsonPath("$.[*].updatedAt").value(hasItem(DEFAULT_UPDATED_AT.toString())))
-            .andExpect(jsonPath("$.[*].likesCount").value(hasItem(DEFAULT_LIKES_COUNT)))
-            .andExpect(jsonPath("$.[*].repliesCount").value(hasItem(DEFAULT_REPLIES_COUNT)))
             .andExpect(jsonPath("$.[*].mentions").value(hasItem(DEFAULT_MENTIONS.toString())));
     }
 
@@ -340,8 +294,6 @@ class CommentResourceIT {
             .andExpect(jsonPath("$.content").value(DEFAULT_CONTENT))
             .andExpect(jsonPath("$.createdAt").value(DEFAULT_CREATED_AT.toString()))
             .andExpect(jsonPath("$.updatedAt").value(DEFAULT_UPDATED_AT.toString()))
-            .andExpect(jsonPath("$.likesCount").value(DEFAULT_LIKES_COUNT))
-            .andExpect(jsonPath("$.repliesCount").value(DEFAULT_REPLIES_COUNT))
             .andExpect(jsonPath("$.mentions").value(DEFAULT_MENTIONS.toString()));
     }
 
@@ -371,8 +323,6 @@ class CommentResourceIT {
             .content(UPDATED_CONTENT)
             .createdAt(UPDATED_CREATED_AT)
             .updatedAt(UPDATED_UPDATED_AT)
-            .likesCount(UPDATED_LIKES_COUNT)
-            .repliesCount(UPDATED_REPLIES_COUNT)
             .mentions(UPDATED_MENTIONS);
         CommentDTO commentDTO = commentMapper.toDto(updatedComment);
 
@@ -466,11 +416,7 @@ class CommentResourceIT {
         Comment partialUpdatedComment = new Comment();
         partialUpdatedComment.setId(comment.getId());
 
-        partialUpdatedComment
-            .parentType(UPDATED_PARENT_TYPE)
-            .createdAt(UPDATED_CREATED_AT)
-            .updatedAt(UPDATED_UPDATED_AT)
-            .repliesCount(UPDATED_REPLIES_COUNT);
+        partialUpdatedComment.parentType(UPDATED_PARENT_TYPE).createdAt(UPDATED_CREATED_AT).updatedAt(UPDATED_UPDATED_AT);
 
         restCommentMockMvc
             .perform(
@@ -506,8 +452,6 @@ class CommentResourceIT {
             .content(UPDATED_CONTENT)
             .createdAt(UPDATED_CREATED_AT)
             .updatedAt(UPDATED_UPDATED_AT)
-            .likesCount(UPDATED_LIKES_COUNT)
-            .repliesCount(UPDATED_REPLIES_COUNT)
             .mentions(UPDATED_MENTIONS);
 
         restCommentMockMvc

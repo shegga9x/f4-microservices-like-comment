@@ -54,14 +54,6 @@ public class Comment implements Serializable {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
-    @NotNull
-    @Column(name = "likes_count", nullable = false)
-    private Integer likesCount;
-
-    @NotNull
-    @Column(name = "replies_count", nullable = false)
-    private Integer repliesCount;
-
     @JdbcTypeCode(SqlTypes.VARCHAR)
     @Column(name = "mentions", length = 36)
     private UUID mentions;
@@ -159,32 +151,6 @@ public class Comment implements Serializable {
         this.updatedAt = updatedAt;
     }
 
-    public Integer getLikesCount() {
-        return this.likesCount;
-    }
-
-    public Comment likesCount(Integer likesCount) {
-        this.setLikesCount(likesCount);
-        return this;
-    }
-
-    public void setLikesCount(Integer likesCount) {
-        this.likesCount = likesCount;
-    }
-
-    public Integer getRepliesCount() {
-        return this.repliesCount;
-    }
-
-    public Comment repliesCount(Integer repliesCount) {
-        this.setRepliesCount(repliesCount);
-        return this;
-    }
-
-    public void setRepliesCount(Integer repliesCount) {
-        this.repliesCount = repliesCount;
-    }
-
     public UUID getMentions() {
         return this.mentions;
     }
@@ -228,8 +194,6 @@ public class Comment implements Serializable {
             ", content='" + getContent() + "'" +
             ", createdAt='" + getCreatedAt() + "'" +
             ", updatedAt='" + getUpdatedAt() + "'" +
-            ", likesCount=" + getLikesCount() +
-            ", repliesCount=" + getRepliesCount() +
             ", mentions='" + getMentions() + "'" +
             "}";
     }

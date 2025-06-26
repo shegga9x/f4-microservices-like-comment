@@ -53,8 +53,6 @@ public class CommentAsserts {
             .satisfies(a -> assertThat(a.getContent()).as("check content").isEqualTo(expected.getContent()))
             .satisfies(a -> assertThat(a.getCreatedAt()).as("check createdAt").isEqualTo(expected.getCreatedAt()))
             .satisfies(a -> assertThat(a.getUpdatedAt()).as("check updatedAt").isEqualTo(expected.getUpdatedAt()))
-            .satisfies(a -> assertThat(a.getLikesCount()).as("check likesCount").isEqualTo(expected.getLikesCount()))
-            .satisfies(a -> assertThat(a.getRepliesCount()).as("check repliesCount").isEqualTo(expected.getRepliesCount()))
             .satisfies(a -> assertThat(a.getMentions()).as("check mentions").isEqualTo(expected.getMentions()));
     }
 
