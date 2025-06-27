@@ -4,6 +4,7 @@ import com.f4.commentlike.domain.Comment;
 import com.f4.commentlike.repository.CommentRepository;
 import com.f4.commentlike.service.CommentService;
 import com.f4.commentlike.service.dto.CommentDTO;
+import com.f4.commentlike.service.dto.CommentWithRedisUserDTO;
 import com.f4.commentlike.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -14,6 +15,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.HashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -175,19 +178,38 @@ public class CommentResource {
      *         of comments in body.
      */
     @GetMapping("/by-parent")
-    public ResponseEntity<List<CommentDTO>> getCommentsByParent(
+    public ResponseEntity<List<CommentWithRedisUserDTO>> getCommentsByParent(
             @RequestParam("parentId") UUID parentId,
             @RequestParam("parentType") String parentType,
             @org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         LOG.debug("REST request to get comments for parentId: {} and parentType: {}", parentId, parentType);
-        Page<CommentDTO> page = commentService.findByParentIdAndParentType(parentId, parentType, pageable);
+        Page<CommentWithRedisUserDTO> page = commentService.findByParentIdAndParentType(parentId, parentType, pageable);
         HttpHeaders headers = PaginationUtil
                 .generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
     /**
-     * {@code GET  /comments/count} : get count of comments by parentId and
+     * {@code POST  /comments/countCommentsParentIdsAndParentType} : get comment
+     * counts for multiple parent IDs and parent type.
+     *
+     * @param parentIds  the list of parent IDs to count comments for.
+     * @param parentType the parent type to count comments for.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
+     *         of comment counts in body.
+     */
+    @GetMapping("/countCommentsParentIdsAndParentType")
+    public ResponseEntity<List<Integer>> countCommentsParentIdsAndParentType(
+            @RequestParam("parentIds") List<UUID> parentIds,
+            @RequestParam("parentType") String parentType) {
+        LOG.debug("REST request to get comment counts for parentIds: {} and parentType: {}", parentIds, parentType);
+        List<Integer> commentCounts = commentService.countCommentsParentIdsAndParentType(parentIds, parentType);
+        return ResponseEntity.ok(commentCounts);
+    }
+
+    /**
+     * {@code GET  /comments/countByParentIdAndParentType} : get count of comments
+     * by parentId and
      * parentType.
      *
      * @param parentId   the parent ID to count comments for.

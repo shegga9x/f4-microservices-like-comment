@@ -1,6 +1,9 @@
 package com.f4.commentlike.service;
 
 import com.f4.commentlike.service.dto.LikeDTO;
+import com.f4.commentlike.service.dto.LikeWithRedisUserDTO;
+
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
@@ -60,19 +63,28 @@ public interface LikeService {
     /**
      * Get likes by parentId and parentType.
      *
-     * @param parentId the parent ID.
+     * @param parentId   the parent ID.
      * @param parentType the parent type.
-     * @param pageable the pagination information.
+     * @param pageable   the pagination information.
      * @return the list of entities.
      */
-    Page<LikeDTO> findByParentIdAndParentType(UUID parentId, String parentType, Pageable pageable);
+    Page<LikeWithRedisUserDTO> findByParentIdAndParentType(UUID parentId, String parentType, Pageable pageable);
 
     /**
      * Count likes by parentId and parentType.
      *
-     * @param parentId the parent ID.
+     * @param parentId   the parent ID.
      * @param parentType the parent type.
      * @return the count of entities.
      */
     long countByParentIdAndParentType(UUID parentId, String parentType);
+
+    /**
+     * Get like counts for a list of parent IDs and a parent type.
+     *
+     * @param parentIds  the list of parent IDs.
+     * @param parentType the parent type.
+     * @return a list of like counts corresponding to each parent ID.
+     */
+    public List<Integer> countLikesParentIdsAndParentType(List<UUID> parentIds, String parentType);
 }

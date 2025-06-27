@@ -1,15 +1,28 @@
 package com.f4.commentlike.service.impl;
 
+import com.f4.commentlike.client.api.UserResourceApi;
+import com.f4.commentlike.client.model.RedisUserDTO;
 import com.f4.commentlike.domain.Like;
 import com.f4.commentlike.repository.LikeRepository;
 import com.f4.commentlike.service.LikeService;
+import com.f4.commentlike.service.dto.CommentDTO;
+import com.f4.commentlike.service.dto.CommentWithRedisUserDTO;
 import com.f4.commentlike.service.dto.LikeDTO;
+import com.f4.commentlike.service.dto.LikeWithRedisUserDTO;
 import com.f4.commentlike.service.mapper.LikeMapper;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,9 +40,12 @@ public class LikeServiceImpl implements LikeService {
 
     private final LikeMapper likeMapper;
 
-    public LikeServiceImpl(LikeRepository likeRepository, LikeMapper likeMapper) {
+    private final UserResourceApi userResourceApi;
+
+    public LikeServiceImpl(LikeRepository likeRepository, LikeMapper likeMapper, UserResourceApi userResourceApi) {
         this.likeRepository = likeRepository;
         this.likeMapper = likeMapper;
+        this.userResourceApi = userResourceApi;
     }
 
     @Override
@@ -53,14 +69,14 @@ public class LikeServiceImpl implements LikeService {
         LOG.debug("Request to partially update Like : {}", likeDTO);
 
         return likeRepository
-            .findById(likeDTO.getId())
-            .map(existingLike -> {
-                likeMapper.partialUpdate(existingLike, likeDTO);
+                .findById(likeDTO.getId())
+                .map(existingLike -> {
+                    likeMapper.partialUpdate(existingLike, likeDTO);
 
-                return existingLike;
-            })
-            .map(likeRepository::save)
-            .map(likeMapper::toDto);
+                    return existingLike;
+                })
+                .map(likeRepository::save)
+                .map(likeMapper::toDto);
     }
 
     @Override
@@ -85,10 +101,36 @@ public class LikeServiceImpl implements LikeService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<LikeDTO> findByParentIdAndParentType(UUID parentId, String parentType, Pageable pageable) {
-        LOG.debug("Request to get Likes by parentId: {} and parentType: {}", parentId, parentType);
-        return likeRepository.findByParentIdAndParentType(parentId, parentType, pageable)
-            .map(likeMapper::toDto);
+    public Page<LikeWithRedisUserDTO> findByParentIdAndParentType(UUID parentId, String parentType,
+            Pageable pageable) {
+        LOG.debug("Request to get userIds from Likes by parentId: {} and parentType: {}", parentId, parentType);
+
+        Page<LikeDTO> likePage = likeRepository.findByParentIdAndParentType(parentId, parentType, pageable)
+                .map(likeMapper::toDto);
+
+        List<LikeDTO> likeDTOs = likePage.getContent();
+
+        List<UUID> userIds = likeDTOs.stream()
+                .map(LikeDTO::getUserId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+
+        List<RedisUserDTO> redisUserDTOs = userResourceApi.getUsersFromRedisPost(userIds);
+
+        // Map userId -> RedisUserDTO
+        Map<UUID, RedisUserDTO> userMap = redisUserDTOs.stream()
+                .collect(Collectors.toMap(RedisUserDTO::getId, Function.identity()));
+
+        // Build LikeWithRedisUserDTO list
+        List<LikeWithRedisUserDTO> combined = likeDTOs.stream()
+                .map(like -> new LikeWithRedisUserDTO(
+                        like,
+                        userMap.get(like.getUserId())))
+                .collect(Collectors.toList());
+
+        // Return as a Page
+        return new PageImpl<>(combined, pageable, likePage.getTotalElements());
     }
 
     @Override
@@ -96,4 +138,20 @@ public class LikeServiceImpl implements LikeService {
         LOG.debug("Request to count Likes by parentId: {} and parentType: {}", parentId, parentType);
         return likeRepository.countByParentIdAndParentType(parentId, parentType);
     }
+
+    public List<Integer> countLikesParentIdsAndParentType(List<UUID> parentIds, String parentType) {
+        List<Object[]> rawCounts = likeRepository.countLikesParentIdsAndParentType(parentIds, parentType);
+
+        // Map UUID → count
+        Map<UUID, Integer> countMap = rawCounts.stream()
+                .collect(Collectors.toMap(
+                        row -> (UUID) row[0],
+                        row -> ((Number) row[1]).intValue()));
+
+        // Return ordered list of counts matching the input parentIds
+        return parentIds.stream()
+                .map(id -> countMap.getOrDefault(id, 0))
+                .collect(Collectors.toList());
+    }
+
 }
