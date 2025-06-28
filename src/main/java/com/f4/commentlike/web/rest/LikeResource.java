@@ -62,7 +62,7 @@ public class LikeResource {
     public ResponseEntity<LikeDTO> createLike(@Valid @RequestBody LikeDTO likeDTO) throws URISyntaxException {
         LOG.debug("REST request to save Like : {}", likeDTO);
         if (likeDTO.getId() != null) {
-            throw new BadRequestAlertException("A new like cannot already have an ID", ENTITY_NAME, "idexists");
+            likeDTO.setId(null); // Ensure ID is null for creation
         }
         likeDTO = likeService.save(likeDTO);
         return ResponseEntity.created(new URI("/api/likes/" + likeDTO.getId()))
