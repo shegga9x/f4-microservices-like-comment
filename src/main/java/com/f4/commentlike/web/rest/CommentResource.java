@@ -67,7 +67,7 @@ public class CommentResource {
             throws URISyntaxException {
         LOG.debug("REST request to save Comment : {}", commentDTO);
         if (commentDTO.getId() != null) {
-            throw new BadRequestAlertException("A new comment cannot already have an ID", ENTITY_NAME, "idexists");
+            commentDTO.setId(null); // Ensure ID is null for new comment creation
         }
         commentDTO = commentService.save(commentDTO);
         return ResponseEntity.created(new URI("/api/comments/" + commentDTO.getId()))
