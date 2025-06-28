@@ -28,4 +28,6 @@ public interface LikeRepository extends JpaRepository<Like, UUID> {
             @Param("parentType") String parentType);
 
     boolean existsByParentIdAndUserId(UUID parentId, UUID userId);
+
+    void deleteByParentIdAndUserId(UUID parentId, UUID userId);
 }

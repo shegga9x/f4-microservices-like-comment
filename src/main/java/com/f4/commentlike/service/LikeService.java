@@ -96,4 +96,12 @@ public interface LikeService {
      * @return true if like exists, false otherwise.
      */
     boolean existsByParentIdAndUserId(UUID parentId, UUID userId);
+
+    /**
+     * Delete like by parentId and userId.
+     *
+     * @param parentId the parent ID.
+     * @param userId   the user ID.
+     */
+    void deleteByParentIdAndUserId(UUID parentId, UUID userId);
 }

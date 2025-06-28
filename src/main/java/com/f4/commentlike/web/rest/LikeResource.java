@@ -246,6 +246,25 @@ public class LikeResource {
     }
 
     /**
+     * {@code DELETE  /likes/by-parent-and-user} : delete like by parentId and userId.
+     *
+     * @param parentId the parent ID.
+     * @param userId   the user ID.
+     * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
+     */
+    @DeleteMapping("/by-parent-and-user")
+    public ResponseEntity<Void> deleteLikeByParentIdAndUserId(
+            @RequestParam("parentId") UUID parentId,
+            @RequestParam("userId") UUID userId) {
+        LOG.debug("REST request to delete like by parentId: {} and userId: {}", parentId, userId);
+        likeService.deleteByParentIdAndUserId(parentId, userId);
+        return ResponseEntity.noContent()
+                .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, 
+                    parentId.toString() + "-" + userId.toString()))
+                .build();
+    }
+
+    /**
      * {@code GET  /likes/countLikesParentIdsAndParentType} : get like counts for a list of parent IDs and a
      * parent type.
      *

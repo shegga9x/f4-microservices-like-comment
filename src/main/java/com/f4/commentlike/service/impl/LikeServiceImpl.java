@@ -159,4 +159,10 @@ public class LikeServiceImpl implements LikeService {
         return likeRepository.existsByParentIdAndUserId(parentId, userId);
     }
 
+    @Override
+    public void deleteByParentIdAndUserId(UUID parentId, UUID userId) {
+        LOG.debug("Request to delete Like by parentId: {} and userId: {}", parentId, userId);
+        likeRepository.deleteByParentIdAndUserId(parentId, userId);
+    }
+
 }
