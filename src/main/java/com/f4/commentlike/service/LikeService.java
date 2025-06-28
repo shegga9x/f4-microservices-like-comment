@@ -87,4 +87,13 @@ public interface LikeService {
      * @return a list of like counts corresponding to each parent ID.
      */
     public List<Integer> countLikesParentIdsAndParentType(List<UUID> parentIds, String parentType);
+
+    /**
+     * Check if a like exists by parentId and userId.
+     *
+     * @param parentId the parent ID.
+     * @param userId   the user ID.
+     * @return true if like exists, false otherwise.
+     */
+    boolean existsByParentIdAndUserId(UUID parentId, UUID userId);
 }

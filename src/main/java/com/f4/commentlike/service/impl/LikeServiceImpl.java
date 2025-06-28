@@ -5,8 +5,6 @@ import com.f4.commentlike.client.model.RedisUserDTO;
 import com.f4.commentlike.domain.Like;
 import com.f4.commentlike.repository.LikeRepository;
 import com.f4.commentlike.service.LikeService;
-import com.f4.commentlike.service.dto.CommentDTO;
-import com.f4.commentlike.service.dto.CommentWithRedisUserDTO;
 import com.f4.commentlike.service.dto.LikeDTO;
 import com.f4.commentlike.service.dto.LikeWithRedisUserDTO;
 import com.f4.commentlike.service.mapper.LikeMapper;
@@ -139,6 +137,7 @@ public class LikeServiceImpl implements LikeService {
         return likeRepository.countByParentIdAndParentType(parentId, parentType);
     }
 
+    @Override
     public List<Integer> countLikesParentIdsAndParentType(List<UUID> parentIds, String parentType) {
         List<Object[]> rawCounts = likeRepository.countLikesParentIdsAndParentType(parentIds, parentType);
 
@@ -152,6 +151,12 @@ public class LikeServiceImpl implements LikeService {
         return parentIds.stream()
                 .map(id -> countMap.getOrDefault(id, 0))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean existsByParentIdAndUserId(UUID parentId, UUID userId) {
+        LOG.debug("Request to check if Like exists by parentId: {} and userId: {}", parentId, userId);
+        return likeRepository.existsByParentIdAndUserId(parentId, userId);
     }
 
 }

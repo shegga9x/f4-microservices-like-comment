@@ -230,7 +230,23 @@ public class LikeResource {
     }
 
     /**
-     * {@code GET  /likes/counts} : get like counts for a list of parent IDs and a
+     * {@code GET  /likes/exists} : check if like exists by parentId and userId.
+     *
+     * @param parentId the parent ID to check.
+     * @param userId   the user ID to check.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and boolean result in body.
+     */
+    @GetMapping("/exists")
+    public ResponseEntity<Boolean> checkLikeExists(
+            @RequestParam("parentId") UUID parentId,
+            @RequestParam("userId") UUID userId) {
+        LOG.debug("REST request to check if like exists for parentId: {} and userId: {}", parentId, userId);
+        boolean exists = likeService.existsByParentIdAndUserId(parentId, userId);
+        return ResponseEntity.ok(exists);
+    }
+
+    /**
+     * {@code GET  /likes/countLikesParentIdsAndParentType} : get like counts for a list of parent IDs and a
      * parent type.
      *
      * @param parentIds  the list of parent IDs to get like counts for.

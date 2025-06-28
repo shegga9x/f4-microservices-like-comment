@@ -27,4 +27,5 @@ public interface LikeRepository extends JpaRepository<Like, UUID> {
             @Param("parentIds") List<UUID> parentIds,
             @Param("parentType") String parentType);
 
+    boolean existsByParentIdAndUserId(UUID parentId, UUID userId);
 }
